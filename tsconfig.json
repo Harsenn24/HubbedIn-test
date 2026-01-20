@@ -13,7 +13,7 @@
     "sourceMap": true,
     "declaration": false,
 
-    "types": ["node"],
-    "moduleResolution": "node"
+    "types": ["node", "jest"],
+    "moduleResolution": "node",
   }
 }

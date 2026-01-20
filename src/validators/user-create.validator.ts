@@ -3,31 +3,31 @@ import { body } from "express-validator";
 export const createUserValidator = [
     body("name")
         .notEmpty()
-        .withMessage("Name is required"),
+        .withMessage("name_is_required"),
 
     body("email")
         .notEmpty()
-        .withMessage("email is required")
+        .withMessage("email_is_required")
         .isEmail()
-        .withMessage("Valid email is required"),
+        .withMessage("valid_email_is_required"),
 
     body("birthday")
         .notEmpty()
-        .withMessage("birthday is required")
+        .withMessage("birthday_is_required")
         .isISO8601()
-        .withMessage("Birthday must be in ISO8601 format (YYYY-MM-DD)"),
+        .withMessage("birthday_must_be_in_iso8601_format_yyyy_mm_dd"),
 
     body("timezone")
         .notEmpty()
-        .withMessage("Timezone is required")
+        .withMessage("timezone_is_required")
         .isString()
-        .withMessage("Timezone must be a valid IANA timezone e.g. America/New_York")
+        .withMessage("timezone_must_be_string")
         .custom((value) => {
             try {
                 Intl.DateTimeFormat(undefined, { timeZone: value });
                 return true;
             } catch {
-                throw new Error("Invalid IANA timezone");
+                throw new Error("invalid_IANA_timezone");
             }
         }),
 ];

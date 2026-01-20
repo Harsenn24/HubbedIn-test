@@ -3,49 +3,48 @@ import { body } from "express-validator";
 export const updateUserValidator = [
 
     body("id")
+        .notEmpty().withMessage("id_is_required")
         .isString()
-        .withMessage("id must be a string")
-        .notEmpty().withMessage("id cannot be empty"),
+        .withMessage("id_must_be_a_string"),
 
     body("name")
         .optional()
         .isString()
-        .withMessage("Name must be a string")
+        .withMessage("name_must_be_a_string")
         .trim()
-        .notEmpty().withMessage("Name cannot be empty"),
+        .notEmpty().withMessage("name_is_required"),
 
     body("email")
         .optional()
         .isString()
-        .withMessage("email must be a string")
+        .withMessage("email_must_be_a_string")
         .notEmpty()
-        .withMessage("email is required")
+        .withMessage("email_is_required")
         .isEmail()
-        .withMessage("Valid email is required"),
+        .withMessage("email_must_be_valid"),
 
     body("birthday")
         .optional()
         .isString()
-        .withMessage("email must be a string")
+        .withMessage("birthday_must_be_a_string")
         .notEmpty()
-        .withMessage("birthday is required")
+        .withMessage("birthday_is_required")
         .isISO8601()
-        .withMessage("Birthday must be in ISO8601 format (YYYY-MM-DD)"),
+        .withMessage("birthday_must_be_in_iso8601_format_yyyy_mm_dd"),
+
 
     body("timezone")
         .optional()
         .isString()
-        .withMessage("email must be a string")
+        .withMessage("timezone_must_be_a_string")
         .notEmpty()
-        .withMessage("Timezone is required")
-        .isString()
-        .withMessage("Timezone must be a valid IANA timezone e.g. America/New_York")
+        .withMessage("timezone_is_required")
         .custom((value) => {
             try {
                 Intl.DateTimeFormat(undefined, { timeZone: value });
                 return true;
             } catch {
-                throw new Error("Invalid IANA timezone");
+                throw new Error("invalid_IANA_timezone");
             }
         }),
 ];
