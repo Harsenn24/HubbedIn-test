@@ -9,7 +9,11 @@ export const createUser = async (req: Request, res: Response) => {
     const payload = req.body as UserCreateDto
     const emailData = await user.findOne({ email: payload.email });
     if (emailData) {
-      return res.status(400).json({ error: "Email already exists" });
+      return res.status(400).json({
+        status: false,
+        message: "email_exists",
+        data: []
+      });
     }
     const userCreate = await createUserRepo(payload);
     return res.status(200).json({
@@ -55,7 +59,7 @@ export const findDetailById = async (req: Request, res: Response) => {
     if (!data) {
       return res.status(400).json({
         status: false,
-        message: "User not found",
+        message: "user_not_found",
         data: []
       });
     }
@@ -87,7 +91,9 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    if (userData.email === payload.email || userData.name === payload.name || userData.birthday === payload.birthday || userData.timezone === payload.timezone) {
+    const birthdayData = userData.birthday.toISOString().split("T")[0];
+
+    if (userData.email === payload.email || userData.name === payload.name || birthdayData=== payload.birthday?.toString() || userData.timezone === payload.timezone) {
       return res.status(400).json({
         status: false,
         message: "no_changes_detected",
