@@ -9,6 +9,8 @@ describe('User Api CRUD Negative Case', () => {
     });
 
     let userId: string | null = null
+    const fakeObjectId = new mongoose.Types.ObjectId().toString();
+
 
 
     it("should be failed create user without name", async () => {
@@ -153,19 +155,17 @@ describe('User Api CRUD Negative Case', () => {
     });
 
     it("should be failed get detail user with invalid id", async () => {
-        const newId = userId?.slice(0, -1) + "5"
-        const res = await request(app).get(`/users/${newId}`);
+        const res = await request(app).get(`/users/${fakeObjectId}`);
         expect(res.status).toBe(400);
         expect(res.body.status).toBe(false);
         expect(res.body.message).toBe("user_not_found");
     });
 
     it("should be failed update user with invalid id", async () => {
-        const newId = userId?.slice(0, -1) + "5"
         const res = await request(app)
             .post("/users/update")
             .send({
-                id: newId,
+                id: fakeObjectId,
                 name: "winarto",
                 email: "winarto@gmail.com",
                 birthday: "1952-06-04",
@@ -298,11 +298,10 @@ describe('User Api CRUD Negative Case', () => {
     });
 
     it("should be failed delete user with false id type", async () => {
-        const newId = userId?.slice(0, -1) + "5"
         const res = await request(app)
             .post("/users/delete")
             .send({
-                id: newId
+                id: fakeObjectId
             });
 
 
