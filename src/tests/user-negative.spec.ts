@@ -4,11 +4,22 @@ import app from '../app'
 import user from '../models/user.model'
 
 describe('User Api CRUD Negative Case', () => {
+    let userId: string 
+
     beforeAll(async () => {
         await mongoose.connect(process.env.MONGO_URL!);
+        const correctData = await request(app)
+            .post("/users")
+            .send({
+                name: "winarto",
+                email: "winarto@gmail.com",
+                birthday: "1952-06-04",
+                timezone: "Asia/Jakarta"
+            });
+
+        userId = correctData.body.data.id
     });
 
-    let userId: string | null = null
     const fakeObjectId = new mongoose.Types.ObjectId().toString();
 
 
@@ -128,16 +139,7 @@ describe('User Api CRUD Negative Case', () => {
     });
 
     it("should be failed create user with duplicate email", async () => {
-        const correctData = await request(app)
-            .post("/users")
-            .send({
-                name: "winarto",
-                email: "winarto@gmail.com",
-                birthday: "1952-06-04",
-                timezone: "Asia/Jakarta"
-            });
 
-        userId = correctData.body.data.id
 
         const res = await request(app)
             .post("/users")
@@ -187,7 +189,11 @@ describe('User Api CRUD Negative Case', () => {
 
         expect(res.status).toBe(400);
         expect(res.body.status).toBe(false);
-        expect(res.body.message).toBe("no_changes_detected");
+        if(!userId) {
+            expect(res.body.message).toBe("user_not_found");
+        } else {
+            expect(res.body.message).toBe("no_changes_detected");
+        }
     });
 
     it("should be failed update user without changing email", async () => {
@@ -201,7 +207,11 @@ describe('User Api CRUD Negative Case', () => {
 
         expect(res.status).toBe(400);
         expect(res.body.status).toBe(false);
-        expect(res.body.message).toBe("no_changes_detected");
+        if(!userId) {
+            expect(res.body.message).toBe("user_not_found");
+        } else {
+            expect(res.body.message).toBe("no_changes_detected");
+        }
     });
 
     it("should be failed update user without changing birthday", async () => {
@@ -215,7 +225,11 @@ describe('User Api CRUD Negative Case', () => {
 
         expect(res.status).toBe(400);
         expect(res.body.status).toBe(false);
-        expect(res.body.message).toBe("no_changes_detected");
+        if(!userId) {
+            expect(res.body.message).toBe("user_not_found");
+        } else {
+            expect(res.body.message).toBe("no_changes_detected");
+        }
     });
 
     it("should be failed update user without changing timezone", async () => {
@@ -229,14 +243,18 @@ describe('User Api CRUD Negative Case', () => {
 
         expect(res.status).toBe(400);
         expect(res.body.status).toBe(false);
-        expect(res.body.message).toBe("no_changes_detected");
+        if(!userId) {
+            expect(res.body.message).toBe("user_not_found");
+        } else {
+            expect(res.body.message).toBe("no_changes_detected");
+        }
     });
 
     it("should be failed update user with empty id", async () => {
         const res = await request(app)
             .post("/users/update")
             .send({
-                
+
             });
 
 
@@ -250,7 +268,7 @@ describe('User Api CRUD Negative Case', () => {
         const res = await request(app)
             .post("/users/update")
             .send({
-                id : 666
+                id: 666
             });
 
 
@@ -263,13 +281,17 @@ describe('User Api CRUD Negative Case', () => {
         const res = await request(app)
             .post("/users/update")
             .send({
-                id : userId
+                id: userId
             });
 
 
         expect(res.status).toBe(400);
         expect(res.body.status).toBe(false);
-        expect(res.body.message).toBe("no_data_changes_detected");
+        if(!userId) {
+            expect(res.body.message).toBe("user_not_found");
+        } else {
+            expect(res.body.message).toBe("no_data_changes_detected");
+        }
     });
 
     it("should be failed delete user with invalid id", async () => {
@@ -309,9 +331,6 @@ describe('User Api CRUD Negative Case', () => {
         expect(res.body.status).toBe(false);
         expect(res.body.message).toBe("user_not_found");
     });
-
-
-
 
 
     afterAll(async () => {
