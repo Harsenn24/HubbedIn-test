@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: birthday_api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/birthday_db
+      - PORT=3000
+    depends_on:
+      - mongo
+
+  worker:
+    build: .
+    container_name: birthday_worker
+    restart: always
+    command: ["node", "dist/workers/birthday.worker.js"]
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/birthday_db
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6
+    container_name: birthday_mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

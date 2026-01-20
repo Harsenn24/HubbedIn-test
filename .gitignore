@@ -1,0 +1,8 @@
+node_modules
+.dockerignore
+.env
+
+dist/
+build/
+out/
+coverage/

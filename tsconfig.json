@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "module": "CommonJS",
+    "target": "ES2020",
+
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+
+    "sourceMap": true,
+    "declaration": false,
+
+    "types": ["node"],
+    "moduleResolution": "node"
+  }
+}
