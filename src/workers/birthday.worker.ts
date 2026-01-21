@@ -5,6 +5,23 @@ import user from "../models/user.model";
 
 const MONGO_URL = process.env.MONGO_URL!;
 
+export async function runBirthdayJob() {
+  const users = await user.find();
+
+  users.forEach(user => {
+    const now = moment().tz(user.timezone);
+    const birthday = moment(user.birthday).tz(user.timezone);
+
+    if (
+      now.format("MM-DD") === birthday.format("MM-DD") &&
+      now.format("HH:mm") === "09:00"
+    ) {
+      console.log(`🎉 Happy Birthday, ${user.name}! 🎉 `);
+    }
+  });
+}
+
+
 async function start() {
   try {
     await mongoose.connect(MONGO_URL, {
@@ -16,21 +33,8 @@ async function start() {
     cron.schedule("* * * * *", async () => {
       try {
 
-        const users = await user.find();
+        await runBirthdayJob();
 
-
-        users.forEach(user => {
-          const now = moment().tz(user.timezone);
-          const birthday = moment(user.birthday).tz(user.timezone);
-
-        
-          if (
-            now.format("MM-DD") === birthday.format("MM-DD") &&
-            now.format("HH:mm") === "09:00"
-          ) {
-            console.log(`🎉 Happy Birthday, ${user.name}! 🎉 `);
-          }
-        });
       } catch (err) {
         console.error("Cron error:", err);
       }
