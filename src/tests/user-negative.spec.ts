@@ -8,6 +8,11 @@ describe('User Api CRUD Negative Case', () => {
 
     beforeAll(async () => {
         await mongoose.connect(process.env.MONGO_URL!);
+        
+    });
+
+    beforeEach(async () => {
+        await user.deleteMany({});
         const correctData = await request(app)
             .post("/users")
             .send({
