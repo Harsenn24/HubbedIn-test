@@ -31,7 +31,7 @@ export async function runBirthdayJob() {
     const isNineAM = nowLocal.hour() === 9 && nowLocal.minute() === 0;
 
     if (isBirthday && isNineAM) {
-      console.log(`🎉 Happy Birthday ${u.name}`);
+      console.log(`🎉 Happy Birthday ${u.name} 🎉`);
     }
   }
 }
