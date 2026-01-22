@@ -6,19 +6,28 @@ import user from "../models/user.model";
 const MONGO_URL = process.env.MONGO_URL!;
 
 export async function runBirthdayJob() {
-  const users = await user.find();
 
-  users.forEach(user => {
-    const now = moment().tz(user.timezone);
-    const birthday = moment(user.birthday).tz(user.timezone);
+  const todayUtc = moment.utc();
 
-    if (
-      now.format("MM-DD") === birthday.format("MM-DD") &&
-      now.format("HH:mm") === "09:00"
-    ) {
-      console.log(`🎉 Happy Birthday, ${user.name}! 🎉 `);
+  const users = await user
+  .find({
+    $expr: {
+      $and: [
+        { $eq: [{ $month: "$birthday" }, todayUtc.month() + 1] },
+        { $eq: [{ $dayOfMonth: "$birthday" }, todayUtc.date()] }
+      ]
     }
-  });
+  })
+  .select("name timezone")
+  .lean();
+
+  for (const u of users) {
+    const nowLocal = moment().tz(u.timezone);
+
+    if (nowLocal.format("HH:mm") === "09:00") {
+      console.log(`🎉 Happy Birthday, ${u.name}! 🎉`);
+    }
+  }
 }
 
 
