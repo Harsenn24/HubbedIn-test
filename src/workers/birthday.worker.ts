@@ -6,30 +6,35 @@ import user from "../models/user.model";
 const MONGO_URL = process.env.MONGO_URL!;
 
 export async function runBirthdayJob() {
-
-  const todayUtc = moment.utc();
+  const today = moment();
 
   const users = await user
-  .find({
-    $expr: {
-      $and: [
-        { $eq: [{ $month: "$birthday" }, todayUtc.month() + 1] },
-        { $eq: [{ $dayOfMonth: "$birthday" }, todayUtc.date()] }
-      ]
-    }
-  })
-  .select("name timezone")
-  .lean();
+    .find({
+      $expr: {
+        $and: [
+          { $eq: [{ $month: "$birthday" }, today.month() + 1] },
+          { $eq: [{ $dayOfMonth: "$birthday" }, today.date()] },
+        ],
+      },
+      timezone: { $exists: true },
+    })
+    .select("name birthday timezone")
+    .lean();
 
   for (const u of users) {
     const nowLocal = moment().tz(u.timezone);
 
-    if (nowLocal.format("HH:mm") === "09:00") {
-      console.log(`🎉 Happy Birthday, ${u.name}! 🎉`);
+    const isBirthday =
+      nowLocal.month() === moment(u.birthday).month() &&
+      nowLocal.date() === moment(u.birthday).date();
+
+    const isNineAM = nowLocal.hour() === 9 && nowLocal.minute() === 0;
+
+    if (isBirthday && isNineAM) {
+      console.log(`🎉 Happy Birthday ${u.name}`);
     }
   }
 }
-
 
 async function start() {
   try {
@@ -39,15 +44,13 @@ async function start() {
 
     console.log("MongoDB connected (worker)");
 
-    cron.schedule("* * * * *", async () => {
-      try {
-
+    cron.schedule(
+      "0 * * * *",
+      async () => {
         await runBirthdayJob();
-
-      } catch (err) {
-        console.error("Cron error:", err);
-      }
-    });
+      },
+      { timezone: "UTC" },
+    );
 
     console.log("Birthday worker running...");
   } catch (err) {
