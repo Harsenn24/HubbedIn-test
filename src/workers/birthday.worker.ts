@@ -39,7 +39,7 @@ async function start() {
 
     console.log("MongoDB connected (worker)");
 
-    cron.schedule("* * * * * ", async () => {
+    cron.schedule("* * * * *", async () => {
       try {
 
         await runBirthdayJob();
