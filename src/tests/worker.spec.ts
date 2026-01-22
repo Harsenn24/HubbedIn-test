@@ -11,24 +11,34 @@ import { runBirthdayJob } from "../workers/birthday.worker";
 import user from "../models/user.model";
 
 describe("Birthday Worker (Unit)", () => {
-    it("logs birthday message at 09:00", async () => {
-        (user.find as jest.Mock).mockResolvedValue([
-            {
-                name: "Harsenn",
-                timezone: "Asia/Jakarta",
-                birthday: new Date("1995-01-21"),
-            },
-        ]);
+    beforeAll(() => {
+        jest.useFakeTimers();
+    });
 
-        jest.spyOn(Date, "now").mockReturnValue(
-            new Date("2026-01-21T09:00:00+07:00").getTime()
-        );
+    afterAll(() => {
+        jest.useRealTimers();
+    });
+
+    it("logs birthday message at 09:00 local time", async () => {
+        (user.find as jest.Mock).mockReturnValue({
+            select: jest.fn().mockReturnThis(),
+            lean: jest.fn().mockResolvedValue([
+                {
+                    name: "Harsenn",
+                    timezone: "Asia/Jakarta",
+                    birthday: new Date("1995-01-21"),
+                },
+            ]),
+        });
+
+        jest.setSystemTime(new Date("2026-01-21T02:00:00Z"));
 
         const logSpy = jest.spyOn(console, "log").mockImplementation();
 
         await runBirthdayJob();
 
-        expect(logSpy).toHaveBeenCalled();
+        expect(logSpy).toHaveBeenCalledWith(
+            "🎉 Happy Birthday, Harsenn! 🎉"
+        );
     });
 });
-

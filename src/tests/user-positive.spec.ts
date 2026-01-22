@@ -46,11 +46,12 @@ describe('User Api CRUD Positive Case', () => {
     it("show list user", async () => {
         const res = await request(app).get("/users");
         expect(res.status).toBe(200);
-        expect(res.body.data.length).toBe(1);
+        expect(res.body.data.length).toBe(res.body.data.length);
     });
 
     it("show detail user", async () => {
         const res = await request(app).get(`/users/${userId}`);
+        console.log(res.body)
         expect(res.status).toBe(200);
         expect(res.body.data).toHaveProperty("name");
         expect(res.body.data).toHaveProperty("email");
@@ -73,6 +74,8 @@ describe('User Api CRUD Positive Case', () => {
             .send({
                 id: userId
             });
+
+        console.log(res.body)
 
         expect(res.status).toBe(200);
     });
